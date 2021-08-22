@@ -1,0 +1,19 @@
+:host {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  margin-top: 8px;
+  border: 1px solid #e3e3e3;
+  width: 100%;
+}
+
+.dropdown-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: #e3e3e3;
+}

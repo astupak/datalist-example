@@ -1,0 +1,14 @@
+<input
+  (input)="onInput($event)"
+  (focus)="openDropdown()"
+  [value]="displayedValue"
+/>
+<div *ngIf="isOpen && filteredItems.length" class="dropdown">
+  <div
+    *ngFor="let item of filteredItems"
+    class="dropdown-item"
+    (click)="selectItem(item)"
+  >
+    {{ item }}
+  </div>
+</div>
