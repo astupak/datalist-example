@@ -1,27 +1,42 @@
-# Datalist
+# Реализация datalist.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.1.0.
+## Первая итерация: Реализация базовой функциональности.
 
-## Development server
+Вход - список рекомендуемых значений, выход - результат ввода.
+Значения предлагаются по вхождению подстроки.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Компонент будет состоять из двух составляющих: input и dropdown.
 
-## Code scaffolding
+Описание компонента:
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+| Поле                                          | Значение                                                                                                                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `@Input items: Array<string>`                 | Входной список строк.                                                                                                     |
+| `@Output onChange: EventEmitter<string>`      | Аутпут результата.                                                                                                        |
+| `filteredItems: Array<string>`                | Массив строк, фильтрующийся при изменении инпута в шаблоне, отображается в дропдауне.                                     |
+| `constructor(private elementRef: ElementRef)` | Конструктор с инжектом `elementRef` для обработки «внешнего» клика.                                                       |
+| `@HostListener(document:click) onBlur`        | Обработчик внешнего клика, если таргет не из datalist-компонента — вызываем `closeDropdown`.                              |
+| `ngOnChanges({items}: {items: SimpleChange})` | Ресетит `filteredItems = items`, сбрасывает `displayedValue`.                                                             |
+| `displayedValue: string`                      | Значение отображаемое в инпуте.                                                                                           |
+| `isOpen: boolean`                             | Состояние дропдауна                                                                                                       |
+| `onInput(event: Event): void`                 | Обработчик изменений инпута, достает из ивента значение инпута и вызывает `setValue`.                                     |
+| `onSelect(value: string): void`               | Обработчик выбора элемента в дропдауне, вызывает `setValue(value)` и `closeDropdown()`.                                   |
+| `setValue(value: string): void`               | Метод установки значения. Сеттит `displayValue`, фильтрует `items` по `value` и сеттит `filteredItems`, эмиттит значение. |
+| `openDropdown(): void`                        | Открывает дропдаун, т.е сеттит `isOpen = true`.                                                                           |
+| `closeDropdown(): void`                       | Закрывает дропдаун, т.е сеттит `isOpen = false`.                                                                          |
 
-## Build
+## Вторая итерация: Поддержка «сложных» типов для `@Input() Items`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Эту итерацию считаю опциональной, вместо этого в компонент можно передавать уже преобразованные данные.
 
-## Running unit tests
+| Поле                                                | Значение                                                                                                                                                                                                        |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@Input() valueAccessor: { getValue(item):string }` | Объект с методом, позволяющим достать значение для отображение в инпуте и дропдауне. Дефолтным значением можно задать объект с методом, который просто возвращает item, так мы сделаем этот инпут опциональным. |
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Третья итерация: Имплементим ControlValueAccessor для поддержки форм ангуляра.
 
-## Running end-to-end tests
+## P.S Улучшательства
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+- Обработчик «внешнего» клика можно вынести в директиву.
 
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Можно сделать datalist компонентом-агностиком, передав в него компонент выступающий в качестве элемента списка. (ngComponentOutlet и тд)
