@@ -4,28 +4,49 @@ import {
   EventEmitter,
   HostListener,
   Input,
-  OnInit,
   Output,
   SimpleChange,
 } from '@angular/core';
-
+/**
+ *  Вход - список рекомендуемых значений, выход - результат ввода.
+ *  Значения предлагаются по вхождению подстроки.
+ */
 @Component({
   selector: 'app-datalist',
   templateUrl: './datalist.component.html',
   styleUrls: ['./datalist.component.css'],
 })
-export class DatalistComponent implements OnInit {
+export class DatalistComponent {
+  /**
+   * Входной список строк
+   */
   @Input() items: Array<string> = [];
 
+  /**
+   * Аутпут результата
+   */
   @Output() onChange: EventEmitter<string> = new EventEmitter<string>();
 
-  isOpen = false;
-
+  /**
+   * Массив строк, фильтрующийся при изменении инпута в шаблоне, отображается в дропдауне
+   */
   filteredItems: Array<string> = this.items;
 
+  /**
+   * Значение, отображаемое в инпуте
+   */
   displayedValue: string = '';
 
-  @HostListener('document:click', ['$event']) onBlur(event: Event) {
+  /**
+   * Состояние дропдауна
+   */
+  isOpen = false;
+
+  /**
+   *
+   * Обработчик внешнего клика, если таргет не из datalist-компонента — вызываем closeDropdown
+   */
+  @HostListener('document:click', ['$event']) onBlur(event: Event): void {
     if (
       !(this.elementRef.nativeElement as HTMLElement).contains(
         event.target as HTMLElement
@@ -36,37 +57,55 @@ export class DatalistComponent implements OnInit {
   }
 
   constructor(private elementRef: ElementRef) {}
-
-  ngOnInit(): void {}
-
-  ngOnChanges({ items }: { items: SimpleChange }) {
+  /**
+   *
+   * Ресетит filteredItems = items, сбрасывает displayedValue
+   */
+  ngOnChanges({ items }: { items: SimpleChange }): void {
+    this.displayedValue = '';
     this.filteredItems = items.currentValue;
   }
-
-  onInput(event: Event) {
+  /**
+   *
+   * Обработчик изменений инпута, достает из ивента значение инпута и вызывает setValue
+   */
+  onInput(event: Event): void {
     const query = (event.target as HTMLInputElement).value;
     this.setValue(query);
   }
-
-  openDropdown() {
-    this.isOpen = true;
-  }
-
-  closeDropdown() {
-    this.isOpen = false;
-  }
-
-  selectItem(item: string) {
+  /**
+   *
+   * Обработчик выбора элемента в дропдауне, вызывает setValue(value) и closeDropdown()
+   */
+  onSelect(item: string): void {
     this.setValue(item);
     this.closeDropdown();
   }
 
-  setValue(value: string) {
+  /**
+   *
+   * Метод установки значения. Сеттит displayValue, фильтрует items по value и сеттит filteredItems
+   */
+  setValue(value: string): void {
     this.displayedValue = value;
     this.filteredItems = this.items.filter((item) =>
       item.toLowerCase().includes(value.toLowerCase())
     );
 
     this.onChange.emit(value);
+  }
+
+  /**
+   * Открывает дропдаун, т.е сеттит isOpen = true
+   */
+  openDropdown(): void {
+    this.isOpen = true;
+  }
+
+  /**
+   * Закрывает дропдаун, т.е сеттит isOpen = false
+   */
+  closeDropdown(): void {
+    this.isOpen = false;
   }
 }

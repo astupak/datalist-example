@@ -7,7 +7,7 @@
   <div
     *ngFor="let item of filteredItems"
     class="dropdown-item"
-    (click)="selectItem(item)"
+    (click)="onSelect(item)"
   >
     {{ item }}
   </div>
